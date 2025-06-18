@@ -1,0 +1,10 @@
+Flask
+Flask-Login
+Flask-Migrate
+Flask-SQLAlchemy
+Werkzeug
+DeepFace
+opencv-python
+numpy
+scikit-learn
+pillow

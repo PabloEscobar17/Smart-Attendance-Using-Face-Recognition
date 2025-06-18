@@ -1,0 +1,41 @@
+# Python cache
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Virtual environments
+venv/
+env/
+ENV/
+.venv/
+
+# Logs and system files
+*.log
+*.sqlite3
+.DS_Store
+
+# Jupyter/IPython
+.ipynb_checkpoints/
+
+# IDE/editor config
+.vscode/
+*.code-workspace
+*.idea/
+
+# Flask/DeepFace temporary files
+temp_face_*.jpg
+att_temp_*.jpg
+
+# App upload folders
+user_data/
+attendance_records/
+
+# Database files
+*.db
+instance/
+faceauth.db
+
+# OS-generated files
+Thumbs.db
+ehthumbs.db
+
