@@ -1,9 +1,10 @@
-Flask
+Flask==2.2.5
 Flask-Login
 Flask-Migrate
 Flask-SQLAlchemy
 Werkzeug
-DeepFace
+DeepFace==0.0.79
+tensorflow==2.11.0
 opencv-python
 numpy
 scikit-learn
