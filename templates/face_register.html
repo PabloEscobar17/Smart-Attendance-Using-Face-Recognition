@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="mb-0">Register Your Face</h4>
+            </div>
+            <div class="card-body text-center">
+                <div class="alert alert-info">
+                    Please position your face in the center of the frame and ensure good lighting
+                </div>
+
+                <div class="mb-4 position-relative">
+                    <video id="webcam" width="640" height="480" autoplay class="rounded border border-3"></video>
+                    <canvas id="canvas" style="display:none;"></canvas>
+                    <div id="overlay" style="position:absolute; top:0; left:0; pointer-events:none;"></div>
+                </div>
+
+                <button id="capture-btn" class="btn btn-primary btn-lg">
+                    <i class="bi bi-camera-fill"></i> Capture Face
+                </button>
+
+                <form id="face-form" method="POST" action="/face-register" style="display:none;">
+                    <input type="hidden" id="face-data" name="face_data">
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const video = document.getElementById('webcam');
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    const overlay = document.getElementById('overlay');
+
+    // Set overlay dimensions
+    overlay.style.width = video.offsetWidth + 'px';
+    overlay.style.height = video.offsetHeight + 'px';
+
+    // Start webcam
+    navigator.mediaDevices.getUserMedia({ video: true })
+        .then(stream => {
+            video.srcObject = stream;
+            // Create face guide overlay
+            const guide = document.createElement('div');
+            guide.style.position = 'absolute';
+            guide.style.top = '50%';
+            guide.style.left = '50%';
+            guide.style.transform = 'translate(-50%, -50%)';
+            guide.style.width = '200px';
+            guide.style.height = '250px';
+            guide.style.border = '3px dashed rgba(255,255,255,0.7)';
+            guide.style.borderRadius = '10px';
+            overlay.appendChild(guide);
+        })
+        .catch(err => {
+            console.error("Webcam error: ", err);
+            alert("Could not access webcam. Please check permissions.");
+        });
+
+    // Capture image
+    document.getElementById('capture-btn').addEventListener('click', function() {
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+        // Show processing indicator
+        const btn = this;
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Processing...';
+
+        // Convert to JPEG (80% quality to reduce size)
+        const imageData = canvas.toDataURL('image/jpeg', 0.8);
+        document.getElementById('face-data').value = imageData;
+        document.getElementById('face-form').submit();
+    });
+});
+</script>
+{% endblock %}

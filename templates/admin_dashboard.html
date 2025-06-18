@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <h2 class="my-4">Admin Dashboard</h2>
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <h4>Attendance Records</h4>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>User</th>
+                            <th>Time</th>
+                            <th>Method</th>
+                            <th>Confidence</th>
+                            <th>Process Time</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for att in attendances %}
+                        <tr>
+                            <td>{{ att.user.username }}</td>
+                            <td>{{ att.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                            <td>{{ att.method }}</td>
+                            <td>{{ "%.2f"|format(att.confidence) if att.confidence else 'N/A' }}</td>
+                            <td>{{ "%.2fs"|format(att.process_time) if att.process_time else 'N/A' }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <h4>Registered Users</h4>
+        </div>
+        <div class="card-body">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Username</th>
+                        <th>Registered On</th>
+                        <th>Face Registered</th>
+                        <th>Is Admin</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in users %}
+                    <tr>
+                        <td>{{ user.username }}</td>
+                        <td>{{ user.registered_on.strftime('%Y-%m-%d') }}</td>
+                        <td>{{ 'Yes' if user.face_encoding else 'No' }}</td>
+                        <td>{{ 'Yes' if user.is_admin else 'No' }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

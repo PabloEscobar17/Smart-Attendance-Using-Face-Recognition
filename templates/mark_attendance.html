@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="mb-0">Mark Attendance</h4>
+            </div>
+            <div class="card-body text-center">
+                <div class="alert alert-info mb-4">
+                    Look directly at the camera to mark your attendance
+                </div>
+
+                <div class="position-relative mb-4">
+                    <video id="webcam" width="640" height="480" autoplay class="rounded border border-3"></video>
+                    <canvas id="canvas" style="display:none;"></canvas>
+                    <div id="result-overlay" style="display:none;"></div>
+                </div>
+
+                <form id="attendance-form" method="POST" style="display:none;">
+                    <input type="hidden" id="face-data" name="face_data">
+                </form>
+
+                <div id="status-message" class="alert alert-secondary">
+                    Camera is ready. Looking for faces...
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const video = document.getElementById('webcam');
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    const statusMsg = document.getElementById('status-message');
+    const resultOverlay = document.getElementById('result-overlay');
+
+    // Start webcam
+    navigator.mediaDevices.getUserMedia({ video: true })
+        .then(stream => {
+            video.srcObject = stream;
+            startFaceDetection();
+        })
+        .catch(err => {
+            console.error("Webcam error: ", err);
+            statusMsg.innerHTML = '<div class="alert alert-danger">Could not access webcam. Please check permissions.</div>';
+        });
+
+    function startFaceDetection() {
+        // Continuously capture and check for faces
+        setInterval(() => {
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            // Convert to JPEG (lower quality for faster processing)
+            const imageData = canvas.toDataURL('image/jpeg', 0.7);
+            document.getElementById('face-data').value = imageData;
+
+            // Submit form automatically when face is detected
+            document.getElementById('attendance-form').submit();
+        }, 3000); // Check every 3 seconds
+    }
+
+    // Show recognition result if flashed message exists
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                {% if category == 'success' %}
+                    resultOverlay.style.display = 'block';
+                    resultOverlay.style.position = 'absolute';
+                    resultOverlay.style.top = '0';
+                    resultOverlay.style.left = '0';
+                    resultOverlay.style.width = '100%';
+                    resultOverlay.style.height = '100%';
+                    resultOverlay.style.backgroundColor = 'rgba(0,255,0,0.3)';
+                    resultOverlay.innerHTML = `
+                        <div style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+                                    background:white; padding:20px; border-radius:10px; text-align:center;">
+                            <h3>Attendance Marked!</h3>
+                            <p>{{ message }}</p>
+                            <a href="{{ url_for('dashboard') }}" class="btn btn-success mt-2">Continue</a>
+                        </div>
+                    `;
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+});
+</script>
+{% endblock %}

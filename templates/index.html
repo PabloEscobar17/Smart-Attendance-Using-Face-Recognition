@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="jumbotron text-center mt-5">
+    <h1 class="display-4">Face Recognition Attendance System</h1>
+    <p class="lead">Automate your attendance tracking with facial recognition technology</p>
+    <hr class="my-4">
+    {% if current_user.is_authenticated %}
+        <a class="btn btn-primary btn-lg" href="{{ url_for('mark_attendance') }}" role="button">Mark Attendance</a>
+    {% else %}
+        <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+            <a class="btn btn-primary btn-lg px-4 gap-3" href="{{ url_for('register') }}">Register</a>
+            <a class="btn btn-outline-secondary btn-lg px-4" href="{{ url_for('login') }}">Login</a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
